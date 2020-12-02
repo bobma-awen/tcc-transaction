@@ -1,10 +1,8 @@
 # tcc-transaction
 
->>有兴趣优化和完善的小伙伴欢迎联系我 vx:ai979126035
+>>有兴趣优化和完善的小伙伴欢迎联系我 vx:bob_awen
 
 基于Hyperf的TCC分布式事务
-
-
 
 #### Tcc注意事项:
 *   并发控制
@@ -16,10 +14,10 @@
 
 #### 使用方法：
 
-`composer require loyaltylu/tcc-transaction`
+`composer require bobma-awen/tcc-transaction`
 
-
-`php bin/hyperf.php vendor:publish loyaltylu/tcc-transaction`
+####发布配置文件
+`php bin/hyperf.php vendor:publish bobma-awen/tcc-transaction`
 
 
 * 引用注解：
@@ -34,19 +32,19 @@
 ```php
     /**
      * @Inject
-     * @var CalculatorServiceInterface
+     * @var OrderInterface
      */
     private $service;
 
-    /**
-     * @Compensable(
-     *     master={"services": CalculatorServiceInterface::class, "tryMethod": "creditOrderTcc", "confirmMethod": "confirmCreditOrderTcc", "cancelMethod": "cancelCreditOrderTcc"},
-     *     slave={
-     *         {"services": PayServiceInterface::class, "tryMethod": "creditAccountTcc", "confirmMethod": "confirmCreditAccountTcc", "cancelMethod": "cancelCreditAccountTcc"},
-     *     }
-     * )
-     * @return array
-     */
+     /**
+         *
+         * @Compensable(
+         * master={"services"=OrderInterface::class,"tryMethod"="creditOrderTcc","confirmMethod"="confirmCreditOrderTcc","cancelMethod"="cancelCreditOrderTcc"},
+         * slave={{"services"=PayAccountInterface::class,"tryMethod"="creditAccountTcc","confirmMethod"="confirmCreditAccountTcc","cancelMethod"="cancelCreditAccountTcc"}}
+         * )
+         *
+         * @return array
+         */
 
   public function index(){
         $input = $this->request->input('id');
@@ -97,10 +95,10 @@
 
 ```php
 /**
- * Class CalculatorService.
+ * Class OrderService.
  * @RpcService(name="PayService", protocol="jsonrpc-http", server="jsonrpc-http", publishTo="consul")
  */
-class PayService implements PayServiceInterface
+class PayService implements PayAccountInterface
 {
 public function creditAccountTcc($input)
     {
